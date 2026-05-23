@@ -29,6 +29,11 @@
       "name": "hxcpp-debug-server",
       "type": "haxelib",
       "version": null
+    },
+    {
+      "name": "hxp",
+      "type": "haxelib",
+      "version": null
     }
   ]
 }
