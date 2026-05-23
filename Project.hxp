@@ -107,6 +107,7 @@ class Project extends HXProject
 		addHaxelib('flixel');
 		addHaxelib('flixel-addons');
 		addHaxelib('flixel-ui');
+		addHaxelib('flixel-animate');
 	}
 
 	public function addAssetPath(path:String, ?rename:String, ?library:String = 'default')
