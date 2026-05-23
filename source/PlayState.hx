@@ -2,7 +2,6 @@ package;
 
 import Section.SwagSection;
 import Song.SwagSong;
-import WiggleEffect.WiggleEffectType;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -106,6 +105,8 @@ class PlayState extends MusicBeatState
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
 	public static var seenCutscene:Bool = false;
+
+	var foregroundSprites:FlxTypedGroup<BGSprite>;
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
@@ -213,12 +214,6 @@ class PlayState extends MusicBeatState
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
 		add(gf);
-
-		gfCutsceneLayer = new FlxGroup();
-		add(gfCutsceneLayer);
-
-		bfTankCutsceneLayer = new FlxGroup();
-		add(bfTankCutsceneLayer);
 
 		add(dad);
 		add(boyfriend);
@@ -778,27 +773,6 @@ class PlayState extends MusicBeatState
 				}
 			}
 			// Conductor.lastSongPos = FlxG.sound.music.time;
-		}
-
-		switch (curStage)
-		{
-			case 'philly':
-				if (trainMoving)
-				{
-					trainFrameTiming += elapsed;
-
-					if (trainFrameTiming >= 1 / 24)
-					{
-						updateTrainPos();
-						trainFrameTiming = 0;
-					}
-				}
-
-				lightFadeShader.update((Conductor.crochet / 1000) * FlxG.elapsed * 1.5);
-			// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
-
-			case 'tank':
-				moveTank();
 		}
 
 		super.update(elapsed);
@@ -1656,7 +1630,6 @@ class PlayState extends MusicBeatState
 			// Conductor.changeBPM(SONG.bpm);
 		}
 		// FlxG.log.add('change bpm' + SONG.notes[Std.int(curStep / 16)].changeBPM);
-		wiggleShit.update(Conductor.crochet);
 
 		if (PreferencesMenu.getPref('camera-zoom'))
 		{

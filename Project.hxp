@@ -13,6 +13,8 @@ class Project extends HXProject
 
 	public var VERSION:Array<Int> = [0, 1, 0];
 
+	public var startingTime:Date;
+
 	public static function main()
 	{
 		var project = new Project();
@@ -21,6 +23,8 @@ class Project extends HXProject
 	public function new()
 	{
 		super();
+
+		startingTime = Date.now();
 
 		if (debug)
 			BUILD_DIR = 'debug';
@@ -60,7 +64,12 @@ class Project extends HXProject
 		window.resizable = true;
 
 		preBuildCallbacks.push(new CLICommand('echo', ['STARTING...']));
-		postBuildCallbacks.push(new CLICommand('echo', ['DONE']));
+		postBuildCallbacks.push(new CLICommand('echo', ['DONE in ${calcTimeDiff().getTime() / 1000}s']));
+	}
+
+	function calcTimeDiff():Date
+	{
+		return Date.fromTime(Date.now().getTime() - startingTime.getTime());
 	}
 
 	public function assetSetup()
