@@ -83,10 +83,10 @@ class Project extends HXProject
 
 	public function iconSetup()
 	{
-		addIcon('art/icon16', 16);
-		addIcon('art/icon32', 32);
-		addIcon('art/icon64', 64);
-		addIcon('art/iconOG');
+		addIcon('art/icon16.png', 16);
+		addIcon('art/icon32.png', 32);
+		addIcon('art/icon64.png', 64);
+		addIcon('art/iconOG.png');
 	}
 
 	public function haxedefSetup()
