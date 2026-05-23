@@ -1,15 +1,157 @@
+package;
+
+import haxe.io.Path;
 import hxp.*;
 import lime.tools.*;
+import sys.FileSystem;
 
 class Project extends HXProject
 {
+	public var BUILD_DIR:String = 'release';
+
+	public var weeks:Array<String> = ['tutorial', 'week1'];
+
+	public var VERSION:Array<Int> = [0, 1, 0];
+
+	public static function main()
+	{
+		var project = new Project();
+	}
+
 	public function new()
 	{
 		super();
+
+		if (debug)
+			BUILD_DIR = 'debug';
+
+		appSetup();
+		haxedefSetup();
+		haxelibSetup();
+
+		assetSetup();
+		iconSetup();
+
+		sources.push('source');
 	}
 
-    public function addHaxelib(name:String)
-    {
-        haxelibs.push(new Haxelib(name));
-    }
+	public function appSetup()
+	{
+		meta.title = 'Funkin\' : Maki Edition';
+		meta.version = VERSION.join('.');
+		meta.company = 'Maki';
+		meta.packageName = 'com.maki.funkinME';
+
+		app.main = 'Main';
+		app.file = 'FunkinME';
+		app.preloader = 'flixel.system.FlxPreloader';
+
+		app.path = 'export/$BUILD_DIR';
+
+		window.width = 1280;
+		window.height = 720;
+		window.fps = 60;
+		window.background = 0x000000;
+		window.hardware = true;
+		window.vsync = false;
+
+		window.orientation = Orientation.LANDSCAPE;
+		window.fullscreen = false;
+		window.resizable = true;
+
+		preBuildCallbacks.push(new CLICommand('echo', ['STARTING...']));
+		postBuildCallbacks.push(new CLICommand('echo', ['DONE']));
+	}
+
+	public function assetSetup()
+	{
+		addAssetLibrary('default');
+		addAssetPath('assets/preload', 'assets', 'default');
+
+		function addAssetLibraryAndPath(thing:String)
+		{
+			addAssetLibrary(thing);
+			addAssetPath('assets/$thing', null, thing);
+		}
+
+		addAssetLibraryAndPath('shared');
+		addAssetLibraryAndPath('songs');
+
+		for (week in weeks)
+			addAssetLibraryAndPath(week);
+	}
+
+	public function iconSetup()
+	{
+		addIcon('art/icon16', 16);
+		addIcon('art/icon32', 32);
+		addIcon('art/icon64', 64);
+		addIcon('art/iconOG');
+	}
+
+	public function haxedefSetup()
+	{
+		setHaxedef("FLX_NO_HEALTH");
+		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
+		if (debug)
+			setHaxedef("FLX_NO_DEBUG");
+		setHaxedef("NAPE_RELEASE_BUILD");
+
+		setHaxedef("lime_disable_assets_version");
+
+		setHaxedef("message.reporting", "pretty");
+	}
+
+	public function haxelibSetup()
+	{
+		addHaxelib('flixel');
+		addHaxelib('flixel-addons');
+		addHaxelib('flixel-ui');
+	}
+
+	public function addAssetPath(path:String, ?rename:String, ?library:String = 'default')
+	{
+		var pathBase:String = Path.removeTrailingSlashes((rename != null) ? rename : path);
+
+		if (FileSystem.isDirectory(path) && FileSystem.exists(path))
+		{
+			for (file in FileSystem.readDirectory(path))
+			{
+				var fullPath:String = '$pathBase/$file';
+				var ogPath:String = '$path/$file';
+
+				if (FileSystem.isDirectory(ogPath))
+					addAssetPath(ogPath, fullPath, library);
+				else
+					addAsset(ogPath, fullPath, library);
+			}
+		}
+	}
+
+	public function addAsset(asset:String, ?rename:String, ?library:String = 'default', embed:Bool = false)
+	{
+		var assetVar:Asset = new Asset(asset, rename, null, embed, true);
+		assetVar.library = library;
+		this.assets.push(assetVar);
+	}
+
+	public function addAssetLibrary(name:String, ?preload:Bool = true, ?embed:Bool = false)
+	{
+		libraries.push(new Library('', name, null, embed, preload, false, ''));
+	}
+
+	public function addIcon(path:String, ?size:Int = 0)
+	{
+		icons.push(new Icon(path, size));
+	}
+
+	public function addHaxelib(name:String, ?version:String)
+	{
+		haxelibs.push(new Haxelib(name, version));
+	}
+
+	public function setHaxedef(haxedef:String, ?value:String)
+	{
+		haxedefs.set(haxedef, value ?? '');
+	}
 }

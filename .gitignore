@@ -2,5 +2,6 @@ export/
 .vscode/
 .haxelib/
 dump/
+bin/
 APIStuff.hx
 .DS_STORE
