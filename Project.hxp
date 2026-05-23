@@ -1,5 +1,6 @@
 package;
 
+import haxe.Timer;
 import haxe.io.Path;
 import hxp.*;
 import lime.tools.*;
@@ -13,8 +14,6 @@ class Project extends HXProject
 
 	public var VERSION:Array<Int> = [0, 1, 0];
 
-	public var startingTime:Date;
-
 	public static function main()
 	{
 		var project = new Project();
@@ -24,11 +23,18 @@ class Project extends HXProject
 	{
 		super();
 
-		startingTime = Date.now();
+		Timer.measure(init);
+	}
+
+	public function init()
+	{
+		preBuildCallbacks.push(new CLICommand('echo', ['STARTING...']));
 
 		if (debug)
 			BUILD_DIR = 'debug';
 
+		sources.push('source');
+		
 		appSetup();
 		haxedefSetup();
 		haxelibSetup();
@@ -36,7 +42,7 @@ class Project extends HXProject
 		assetSetup();
 		iconSetup();
 
-		sources.push('source');
+		postBuildCallbacks.push(new CLICommand('echo', ['DONE']));
 	}
 
 	public function appSetup()
@@ -62,14 +68,6 @@ class Project extends HXProject
 		window.orientation = Orientation.LANDSCAPE;
 		window.fullscreen = false;
 		window.resizable = true;
-
-		preBuildCallbacks.push(new CLICommand('echo', ['STARTING...']));
-		postBuildCallbacks.push(new CLICommand('echo', ['DONE in ${calcTimeDiff().getTime() / 1000}s']));
-	}
-
-	function calcTimeDiff():Date
-	{
-		return Date.fromTime(Date.now().getTime() - startingTime.getTime());
 	}
 
 	public function assetSetup()
@@ -163,5 +161,10 @@ class Project extends HXProject
 	public function setHaxedef(haxedef:String, ?value:String)
 	{
 		haxedefs.set(haxedef, value ?? '');
+	}
+
+	public function info(v:Dynamic)
+	{
+		Sys.println(v);
 	}
 }
